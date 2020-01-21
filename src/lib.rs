@@ -15,10 +15,8 @@ pub fn clear_area(buffer: &mut Vec<u32>, screen_width: usize, w: usize, h: usize
 }
 
 pub fn clear_buffer(buffer: &mut Vec<u32>, screen_width: usize, screen_height: usize, clear_color: u32) {
-    for inc_y in 0..screen_height {
-        for inc_x in 0..screen_width {
-            buffer[inc_x + inc_y*screen_width] = clear_color;
-        }
+    for inc_x in 0..screen_width*screen_height {
+        buffer[inc_x] = clear_color;
     }
 }
 
