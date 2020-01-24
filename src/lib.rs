@@ -8,14 +8,17 @@ pub struct Bitmap<'a> {
     pub x: usize,
     /// Bitmap vertical position
     pub y: usize,
-    /// Pixel data
+    /// 32 bits pixel data
     pub pixels: &'a Vec<u32>,
 }
 
 /// The framebuffer struct contains the buffer's width, height, and a pointer to its pixel data
 pub struct Framebuffer<'a> {
+    /// Framebuffer width
     pub width: usize,
+    /// Framebuffer height
     pub height: usize,
+    /// 32 bits pixel data
     pub pixels: &'a mut Vec<u32>,
 }
 
