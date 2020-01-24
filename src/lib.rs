@@ -18,8 +18,10 @@ pub fn blit(source: &Vec<u32>, destination: &mut Vec<u32>, bmp: &BmpBlt) {
 
 pub fn clear_area(buffer: &mut Vec<u32>, screen_width: usize, w: usize, h: usize, x: usize, y: usize, clear_color: u32) {
     for inc_y in 0..h {
+        let x_offset: usize = inc_y*screen_width;
+        let y_offset: usize = y*screen_width;
         for inc_x in 0..w {
-            buffer[inc_x + inc_y*screen_width + x + y*screen_width] = clear_color;
+            buffer[inc_x + x_offset + x + y_offset] = clear_color;
         }
     }
 }
