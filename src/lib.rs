@@ -1,7 +1,5 @@
 /// This structure's goal is to persist user bitmaps sizes and coordinates
 pub struct BmpBlt {
-    /// Framebuffer width
-    pub screen_width: usize,
     /// Bitmap width
     pub w: usize,
     /// Bitmap height
@@ -12,32 +10,39 @@ pub struct BmpBlt {
     pub y: usize
 }
 
+/// The framebuffer struct contains the buffer's width, height, and a pointer to its pixel data
+pub struct Framebuffer<'a> {
+    pub width: usize,
+    pub height: usize,
+    pub pixels: &'a mut Vec<u32>
+}
+
 /// Copies a bitmap to the framebuffer
-pub fn blit(source: &Vec<u32>, destination: &mut Vec<u32>, bmp: &BmpBlt) {
+pub fn blit(source: &Vec<u32>, destination: &mut Framebuffer, bmp: &BmpBlt) {
     for inc_y in 0..bmp.h {
-        let x_offset: usize = inc_y*bmp.screen_width;
-        let y_offset: usize = bmp.y*bmp.screen_width;
+        let x_offset: usize = inc_y*destination.width;
+        let y_offset: usize = bmp.y*destination.width;
         for inc_x in 0..bmp.w {
-            destination[inc_x + x_offset + bmp.x + y_offset] = source[inc_x];
+            destination.pixels[inc_x + x_offset + bmp.x + y_offset] = source[inc_x];
         }
     }
 }
 
 /// Partial clear a the framebuffer
-pub fn clear_area(buffer: &mut Vec<u32>, screen_width: usize, w: usize, h: usize, x: usize, y: usize, clear_color: u32) {
+pub fn clear_area(fb: &mut Framebuffer, w: usize, h: usize, x: usize, y: usize, clear_color: u32) {
     for inc_y in 0..h {
-        let x_offset: usize = inc_y*screen_width;
-        let y_offset: usize = y*screen_width;
+        let x_offset: usize = inc_y*fb.width;
+        let y_offset: usize = y*fb.width;
         for inc_x in 0..w {
-            buffer[inc_x + x_offset + x + y_offset] = clear_color;
+            fb.pixels[inc_x + x_offset + x + y_offset] = clear_color;
         }
     }
 }
 
 /// Complete clear of the framebuffer
-pub fn clear_buffer(buffer: &mut Vec<u32>, screen_width: usize, screen_height: usize, clear_color: u32) {
-    for inc_x in 0..screen_width*screen_height {
-        buffer[inc_x] = clear_color;
+pub fn clear_buffer(fb: &mut Framebuffer, clear_color: u32) {
+    for inc_x in 0..fb.width*fb.height {
+        fb.pixels[inc_x] = clear_color;
     }
 }
 
