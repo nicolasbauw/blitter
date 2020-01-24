@@ -1,5 +1,5 @@
-/// This structure's goal is to persist user bitmaps sizes and coordinates
-pub struct BmpBlt {
+/// This structure's goal is to persist user bitmaps sizes, coordinates, and store a pointer to pixel data
+pub struct Bitmap<'a> {
     /// Bitmap width
     pub w: usize,
     /// Bitmap height
@@ -7,7 +7,9 @@ pub struct BmpBlt {
     /// Bitmap horizontal position
     pub x: usize,
     /// Bitmap vertical position
-    pub y: usize
+    pub y: usize,
+    /// Pixel data
+    pub pixels: &'a Vec<u32>
 }
 
 /// The framebuffer struct contains the buffer's width, height, and a pointer to its pixel data
@@ -18,12 +20,12 @@ pub struct Framebuffer<'a> {
 }
 
 /// Copies a bitmap to the framebuffer
-pub fn blit(source: &Vec<u32>, destination: &mut Framebuffer, bmp: &BmpBlt) {
-    for inc_y in 0..bmp.h {
-        let x_offset: usize = inc_y*destination.width;
-        let y_offset: usize = bmp.y*destination.width;
-        for inc_x in 0..bmp.w {
-            destination.pixels[inc_x + x_offset + bmp.x + y_offset] = source[inc_x];
+pub fn blit(bitmap: &Bitmap, fb: &mut Framebuffer) {
+    for inc_y in 0..bitmap.h {
+        let x_offset: usize = inc_y*fb.width;
+        let y_offset: usize = bitmap.y*fb.width;
+        for inc_x in 0..bitmap.w {
+            fb.pixels[inc_x + x_offset + bitmap.x + y_offset] = bitmap.pixels[inc_x];
         }
     }
 }
