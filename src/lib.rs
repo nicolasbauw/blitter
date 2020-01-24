@@ -1,4 +1,4 @@
-/// This structure's goal is to persist user bitmaps sizes, coordinates, and store a pointer to pixel data
+/// This structure's persists user bitmaps sizes, coordinates, and stores a pointer to its pixel data
 pub struct Bitmap<'a> {
     /// Bitmap width
     pub w: usize,
@@ -19,7 +19,7 @@ pub struct Framebuffer<'a> {
     pub pixels: &'a mut Vec<u32>
 }
 
-/// Copies a bitmap to the framebuffer
+/// Copies a Bitmap to the framebuffer
 pub fn blit(bitmap: &Bitmap, fb: &mut Framebuffer) {
     for inc_y in 0..bitmap.h {
         let x_offset: usize = inc_y*fb.width;
@@ -30,7 +30,7 @@ pub fn blit(bitmap: &Bitmap, fb: &mut Framebuffer) {
     }
 }
 
-/// Partial clear a the framebuffer
+/// Partial clear of the framebuffer
 pub fn clear_area(fb: &mut Framebuffer, w: usize, h: usize, x: usize, y: usize, clear_color: u32) {
     for inc_y in 0..h {
         let x_offset: usize = inc_y*fb.width;
