@@ -1,7 +1,17 @@
-pub fn blit(source: &Vec<u32>, destination: &mut Vec<u32>, screen_width: usize, w: usize, h: usize, x: usize, y: usize) {
-    for inc_y in 0..h {
-        for inc_x in 0..w {
-            destination[inc_x + inc_y*screen_width + x + y*screen_width] = source[inc_x];
+pub struct BmpBlt {
+    pub screen_width: usize,
+    pub w: usize,
+    pub h: usize,
+    pub x: usize,
+    pub y: usize
+}
+
+pub fn blit(source: &Vec<u32>, destination: &mut Vec<u32>, bmp: &BmpBlt) {
+    for inc_y in 0..bmp.h {
+        let x_offset: usize = inc_y*bmp.screen_width;
+        let y_offset: usize = bmp.y*bmp.screen_width;
+        for inc_x in 0..bmp.w {
+            destination[inc_x + x_offset + bmp.x + y_offset] = source[inc_x];
         }
     }
 }
