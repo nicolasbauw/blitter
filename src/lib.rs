@@ -23,6 +23,7 @@
 //!     if bitmaps[0].x < WIDTH - 10 { bitmaps[0].x = bitmaps[0].x+3; } else { fb.clear(0); }
 //!     fb.draw_fatpixel(320,240,4,0xffffffff);
 //! }
+//! ```
 
 /// This structure contains bitmaps sizes, coordinates, and a pointer to its pixel data
 pub struct Bitmap<'a> {

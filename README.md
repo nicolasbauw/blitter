@@ -25,5 +25,6 @@ fn blitter_test(mut fb: &mut Framebuffer, bitmaps: &mut Vec<Bitmap>) {
     if bitmaps[0].x < WIDTH - 10 { bitmaps[0].x = bitmaps[0].x+3; } else { fb.clear(0); }
     fb.draw_fatpixel(320,240,4,0xffffffff);
 }
+```
 
 License: GPL-3.0
