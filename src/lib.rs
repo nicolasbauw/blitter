@@ -1,4 +1,4 @@
-/// This structure's contains bitmaps sizes, coordinates, and a pointer to its pixel data
+/// This structure contains bitmaps sizes, coordinates, and a pointer to its pixel data
 pub struct Bitmap<'a> {
     /// Bitmap width
     pub w: usize,
@@ -59,6 +59,22 @@ impl Framebuffer<'_> {
         for inc_x in 0..self.width * self.height {
             self.pixels[inc_x] = clear_color;
         }
+    }
+
+    /// Drawing a pixel
+    pub fn draw_pixel(&mut self, x: usize, y: usize, color: u32) {
+        self.pixels[x + y*self.width] = color;
+    }
+
+    /// Drawing a fat pixel
+    pub fn draw_fatpixel(
+        &mut self,
+        x: usize,
+        y: usize,
+        size: usize,
+        color: u32,
+    ) {
+        self.clear_area(size, size, x, y, color)
     }
 }
 
