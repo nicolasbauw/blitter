@@ -3,6 +3,10 @@ name = "blitter"
 version = "0.1.0"
 authors = ["Nicolas BAUW <nbauw@hotmail.com>"]
 edition = "2018"
+description = "This library performs various blitting and drawing operations on a 32 bits framebuffer."
+keywords = ["blitter", "bitmap", "pixel", "drawing", "framebuffer"]
+categories = ["graphics", "rendering"]
+license = "GPL-3.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
