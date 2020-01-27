@@ -11,7 +11,7 @@ fn main() {
     let mut fb = Framebuffer {width: WIDTH, height: HEIGHT, pixels: &mut pixels};
     
     // User bitmaps initialization
-    let image:  Vec<u32> =  { vec![0xffffffff; 10] };
+    let image:  Vec<u32> =  { vec![0xffffffff; 100] };
     let mut bitmaps = Vec::new();
     bitmaps.push(Bitmap {w: 10, h: 10, x: 0, y: 0, pixels: &image});
 
