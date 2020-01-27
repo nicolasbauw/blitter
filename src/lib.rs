@@ -35,14 +35,14 @@ use std::{fmt, result::Result};
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum BlitError {
     // Index out of bounds
-    IndexOutOfBounds,
+    BlittingBeyondBoundaries,
 }
 
 impl fmt::Display for BlitError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("tzfile error: ")?;
         f.write_str(match self {
-            BlitError::IndexOutOfBounds => "You are blitting outside the framebuffer !",
+            BlitError::BlittingBeyondBoundaries => "You are blitting outside the framebuffer !",
         })
     }
 }
@@ -74,7 +74,7 @@ pub struct Framebuffer<'a> {
 impl Bitmap<'_> {
     /// Copies a Bitmap to the framebuffer
     pub fn blit(&self, fb: &mut Framebuffer) -> Result<(), BlitError> {
-        if (self.pixels.len()+(self.x+self.w)*(self.y+self.h)) > fb.pixels.len() { return Err(BlitError::IndexOutOfBounds) };
+        if (self.pixels.len()+(self.x+self.w)*(self.y+self.h)) > fb.pixels.len() { return Err(BlitError::BlittingBeyondBoundaries) };
         for inc_y in 0..self.h {
             let x_offset: usize = inc_y * fb.width;
             let y_offset: usize = self.y * fb.width;
@@ -87,7 +87,7 @@ impl Bitmap<'_> {
 
     /// Copies a Bitmap to the framebuffer, applying a color mask (color acting as transparent in case of non alpha framebuffers)
     pub fn blit_cmask(&self, fb: &mut Framebuffer, mask: u32) -> Result<(), BlitError> {
-        if (self.pixels.len()+(self.x+self.w)*(self.y+self.h)) > fb.pixels.len() { return Err(BlitError::IndexOutOfBounds) };
+        if (self.pixels.len()+(self.x+self.w)*(self.y+self.h)) > fb.pixels.len() { return Err(BlitError::BlittingBeyondBoundaries) };
         for inc_y in 0..self.h {
             let x_offset: usize = inc_y * fb.width;
             let y_offset: usize = self.y * fb.width;
@@ -102,7 +102,7 @@ impl Bitmap<'_> {
 
     /// Copies a Bitmap to the framebuffer, applying a bits mask (logical AND)
     pub fn blit_lmask(&self, fb: &mut Framebuffer, mask: &Vec<bool>) -> Result<(), BlitError> {
-        if (self.pixels.len()+(self.x+self.w)*(self.y+self.h)) > fb.pixels.len() { return Err(BlitError::IndexOutOfBounds) };
+        if (self.pixels.len()+(self.x+self.w)*(self.y+self.h)) > fb.pixels.len() { return Err(BlitError::BlittingBeyondBoundaries) };
         let mut c = 0;
         for inc_y in 0..self.h {
             let x_offset: usize = inc_y * fb.width;
@@ -121,7 +121,7 @@ impl Bitmap<'_> {
 impl Framebuffer<'_> {
     /// Partial clear of the framebuffer
     pub fn clear_area(&mut self, w: usize, h: usize, x: usize, y: usize, clear_color: u32) -> Result<(), BlitError> {
-        if ((x+w)*(y+h)) > self.pixels.len() { return Err(BlitError::IndexOutOfBounds) };
+        if ((x+w)*(y+h)) > self.pixels.len() { return Err(BlitError::BlittingBeyondBoundaries) };
         for inc_y in 0..h {
             let x_offset: usize = inc_y * self.width;
             let y_offset: usize = y * self.width;
@@ -141,14 +141,14 @@ impl Framebuffer<'_> {
 
     /// Drawing a pixel
     pub fn draw_pixel(&mut self, x: usize, y: usize, color: u32) -> Result<(), BlitError> {
-        if x > self.width && y > self.height { return Err(BlitError::IndexOutOfBounds) };
+        if x > self.width && y > self.height { return Err(BlitError::BlittingBeyondBoundaries) };
         self.pixels[x + y * self.width] = color;
         Ok(())
     }
 
     /// Drawing a fat pixel
     pub fn draw_fatpixel(&mut self, x: usize, y: usize, size: usize, color: u32) -> Result<(), BlitError> {
-        if x > self.width-size && y > self.height-size { return Err(BlitError::IndexOutOfBounds) };
+        if x > self.width-size && y > self.height-size { return Err(BlitError::BlittingBeyondBoundaries) };
         self.clear_area(size, size, x, y, color).unwrap();
         Ok(())
     }
