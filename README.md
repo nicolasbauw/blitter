@@ -20,14 +20,14 @@ while *display loop with some display library* {
 
 // For testing : moves a 10x10 square and prints a 4x4 pixel at the center of the screen
 fn blitter_test(mut fb: &mut Framebuffer, bitmaps: &mut Vec<Bitmap>) {
-    fb.clear_area(640, 10, 0, 0, 0);
-    bitmaps[0].blit(&mut fb);   //copies a bitmap to the framebuffer
+    fb.clear_area(640, 10, 0, 0, 0).unwrap();
+    bitmaps[0].blit(&mut fb).unwrap();   //copies a bitmap to the framebuffer
     if bitmaps[0].x < WIDTH - 10 { bitmaps[0].x = bitmaps[0].x+3; } else { fb.clear(0); }
-    fb.draw_fatpixel(320,240,4,0xffffffff);
+    fb.draw_fatpixel(320,240,4,0xffffffff).unwrap();
 }
 ```
 
-You can also view and run an example using the [minifb library](https://crates.io/crates/minifb) in the 'examples' directory:
+You can also view and run a (very basic) example using the [minifb library](https://crates.io/crates/minifb) in the 'examples' directory:
 ```
 cargo run --example minifb
 ```
