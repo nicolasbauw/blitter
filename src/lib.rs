@@ -1,4 +1,4 @@
-//! This library performs various blitting and drawing operations on a 32 bits framebuffer.
+//! This library performs various blitting and drawing operations on a raw 32 bits framebuffer, whatever the encoding.
 //! Early development.
 //!
 //! Example:
@@ -66,7 +66,7 @@ impl Bitmap<'_> {
         }
     }
 
-    /// Copies a Bitmap to the framebuffer with a color mask (color acting as transparent in case of non alpha framebuffers)
+    /// Copies a Bitmap to the framebuffer, applying a color mask (color acting as transparent in case of non alpha framebuffers)
     pub fn blit_cmask(&self, fb: &mut Framebuffer, mask: u32) {
         for inc_y in 0..self.h {
             let x_offset: usize = inc_y * fb.width;
@@ -79,7 +79,7 @@ impl Bitmap<'_> {
         }
     }
 
-    /// Copies a Bitmap to the framebuffer with a bits mask (logical AND)
+    /// Copies a Bitmap to the framebuffer, applying a bits mask (logical AND)
     pub fn blit_lmask(&self, fb: &mut Framebuffer, mask: &Vec<bool>) {
         let mut c = 0;
         for inc_y in 0..self.h {
