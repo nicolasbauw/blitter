@@ -42,7 +42,7 @@ impl fmt::Display for BlitError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("tzfile error: ")?;
         f.write_str(match self {
-            BlitError::IndexOutOfBounds => "Index out of bounds",
+            BlitError::IndexOutOfBounds => "You are blitting outside the framebuffer !",
         })
     }
 }
