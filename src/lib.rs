@@ -18,8 +18,8 @@
 //!
 //! // For testing : moves a 10x10 square and prints a 4x4 pixel at the center of the screen
 //! fn blitter_test(mut fb: &mut Framebuffer, bitmaps: &mut Vec<Bitmap>) {
-//!     fb.clear_area(640, 10, 0, 0, 0);
-//!     bitmaps[0].blit(&mut fb);   //copies a bitmap to the framebuffer
+//!     fb.clear_area(640, 10, 0, 0, 0).unwrap();
+//!     bitmaps[0].blit(&mut fb).unwrap();   //copies a bitmap to the framebuffer
 //!     if bitmaps[0].x < WIDTH - 10 { bitmaps[0].x = bitmaps[0].x+3; } else { fb.clear(0); }
 //!     fb.draw_fatpixel(320,240,4,0xffffffff);
 //! }
@@ -120,7 +120,8 @@ impl Bitmap<'_> {
 
 impl Framebuffer<'_> {
     /// Partial clear of the framebuffer
-    pub fn clear_area(&mut self, w: usize, h: usize, x: usize, y: usize, clear_color: u32) {
+    pub fn clear_area(&mut self, w: usize, h: usize, x: usize, y: usize, clear_color: u32) -> Result<(), BlitError> {
+        if ((x+w)*(y+h)) > self.pixels.len() { return Err(BlitError::IndexOutOfBounds) };
         for inc_y in 0..h {
             let x_offset: usize = inc_y * self.width;
             let y_offset: usize = y * self.width;
@@ -128,6 +129,7 @@ impl Framebuffer<'_> {
                 self.pixels[inc_x + x_offset + x + y_offset] = clear_color;
             }
         }
+        Ok(())
     }
 
     /// Complete clear of the framebuffer
@@ -144,7 +146,7 @@ impl Framebuffer<'_> {
 
     /// Drawing a fat pixel
     pub fn draw_fatpixel(&mut self, x: usize, y: usize, size: usize, color: u32) {
-        self.clear_area(size, size, x, y, color)
+        self.clear_area(size, size, x, y, color).unwrap();
     }
 }
 
