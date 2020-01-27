@@ -1,6 +1,6 @@
 # blitter
 
-This library performs various blitting and drawing operations on a 32 bits framebuffer.
+This library performs various blitting and drawing operations on a raw 32 bits framebuffer, whatever the encoding.
 Early development.
 
 Example:
@@ -15,7 +15,7 @@ bitmaps.push(Bitmap {w: 10, h: 10, x: 0, y: 0, pixels: &image::PIXELS});
 
 while *display loop with some display library* {
     blitter_test(&mut fb, &mut bitmaps);
-    *your display lib display update function with &fb.pixels*
+    *your display lib display update function with buffer &fb.pixels*
 }
 
 // For testing : moves a 10x10 square and prints a 4x4 pixel at the center of the screen
@@ -25,6 +25,11 @@ fn blitter_test(mut fb: &mut Framebuffer, bitmaps: &mut Vec<Bitmap>) {
     if bitmaps[0].x < WIDTH - 10 { bitmaps[0].x = bitmaps[0].x+3; } else { fb.clear(0); }
     fb.draw_fatpixel(320,240,4,0xffffffff);
 }
+```
+
+You can also view and run an example using the [minifb library](https://crates.io/crates/minifb) in the 'examples' directory:
+```
+cargo run --example minifb
 ```
 
 License: GPL-3.0
