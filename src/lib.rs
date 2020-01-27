@@ -140,13 +140,17 @@ impl Framebuffer<'_> {
     }
 
     /// Drawing a pixel
-    pub fn draw_pixel(&mut self, x: usize, y: usize, color: u32) {
+    pub fn draw_pixel(&mut self, x: usize, y: usize, color: u32) -> Result<(), BlitError> {
+        if x > self.width && y > self.height { return Err(BlitError::IndexOutOfBounds) };
         self.pixels[x + y * self.width] = color;
+        Ok(())
     }
 
     /// Drawing a fat pixel
-    pub fn draw_fatpixel(&mut self, x: usize, y: usize, size: usize, color: u32) {
+    pub fn draw_fatpixel(&mut self, x: usize, y: usize, size: usize, color: u32) -> Result<(), BlitError> {
+        if x > self.width-size && y > self.height-size { return Err(BlitError::IndexOutOfBounds) };
         self.clear_area(size, size, x, y, color).unwrap();
+        Ok(())
     }
 }
 
