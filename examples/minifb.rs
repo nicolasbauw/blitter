@@ -42,7 +42,7 @@ fn main() {
 // For testing : moves a 10x10 square and prints a 4x4 pixel at the center of the screen
 fn blitter_test(mut fb: &mut Framebuffer, bitmaps: &mut Vec<Bitmap>) {
     fb.clear_area(640, 10, 0, 0, 0);
-    bitmaps[0].blit(&mut fb);
+    bitmaps[0].blit(&mut fb).unwrap();
     if bitmaps[0].x < WIDTH - 10 { bitmaps[0].x = bitmaps[0].x+3; } else { fb.clear(0); }
     fb.draw_fatpixel(320,240,4,0xffffffff);
 }

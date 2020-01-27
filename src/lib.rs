@@ -30,6 +30,23 @@
 //! cargo run --example minifb
 //! ```
 
+use std::{fmt, result::Result};
+
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub enum BlitError {
+    // Index out of bounds
+    IndexOutOfBounds,
+}
+
+impl fmt::Display for BlitError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("tzfile error: ")?;
+        f.write_str(match self {
+            BlitError::IndexOutOfBounds => "Index out of bounds",
+        })
+    }
+}
+
 /// This structure stores bitmap's sizes, coordinates, and a pointer to its pixel data
 pub struct Bitmap<'a> {
     /// Bitmap width
@@ -56,7 +73,8 @@ pub struct Framebuffer<'a> {
 
 impl Bitmap<'_> {
     /// Copies a Bitmap to the framebuffer
-    pub fn blit(&self, fb: &mut Framebuffer) {
+    pub fn blit(&self, fb: &mut Framebuffer) -> Result<(), BlitError> {
+        if (self.pixels.len()+(self.x+self.w)*(self.y+self.h)) > fb.pixels.len() { return Err(BlitError::IndexOutOfBounds) };
         for inc_y in 0..self.h {
             let x_offset: usize = inc_y * fb.width;
             let y_offset: usize = self.y * fb.width;
@@ -64,10 +82,12 @@ impl Bitmap<'_> {
                 fb.pixels[inc_x + x_offset + self.x + y_offset] = self.pixels[inc_x];
             }
         }
+        Ok(())
     }
 
     /// Copies a Bitmap to the framebuffer, applying a color mask (color acting as transparent in case of non alpha framebuffers)
-    pub fn blit_cmask(&self, fb: &mut Framebuffer, mask: u32) {
+    pub fn blit_cmask(&self, fb: &mut Framebuffer, mask: u32) -> Result<(), BlitError> {
+        if (self.pixels.len()+(self.x+self.w)*(self.y+self.h)) > fb.pixels.len() { return Err(BlitError::IndexOutOfBounds) };
         for inc_y in 0..self.h {
             let x_offset: usize = inc_y * fb.width;
             let y_offset: usize = self.y * fb.width;
@@ -77,10 +97,12 @@ impl Bitmap<'_> {
                 };
             }
         }
+        Ok(())
     }
 
     /// Copies a Bitmap to the framebuffer, applying a bits mask (logical AND)
-    pub fn blit_lmask(&self, fb: &mut Framebuffer, mask: &Vec<bool>) {
+    pub fn blit_lmask(&self, fb: &mut Framebuffer, mask: &Vec<bool>) -> Result<(), BlitError> {
+        if (self.pixels.len()+(self.x+self.w)*(self.y+self.h)) > fb.pixels.len() { return Err(BlitError::IndexOutOfBounds) };
         let mut c = 0;
         for inc_y in 0..self.h {
             let x_offset: usize = inc_y * fb.width;
@@ -92,6 +114,7 @@ impl Bitmap<'_> {
                 c += 1;
             }
         }
+        Ok(())
     }
 }
 
