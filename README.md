@@ -1,5 +1,8 @@
 # blitter
 
+[![Current Crates.io Version](https://img.shields.io/crates/v/blitter.svg)](https://crates.io/crates/blitter)
+[![Downloads badge](https://img.shields.io/crates/d/blitter.svg)](https://crates.io/crates/blitter)
+
 This library performs various blitting and drawing operations on a raw 32 bits framebuffer, whatever the encoding.
 Early development.
 
