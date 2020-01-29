@@ -34,6 +34,15 @@
 use std::fs::File;
 use std::{fmt, result::Result};
 
+/// Output format of png decoding function
+#[cfg(feature = "png-decode")]
+pub enum PixelFormat {
+    /// 0RGB
+    Zrgb,
+    /// RGBA, STRIP_ALPHA
+    Rgba,
+}
+
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum BlitError {
     // Index out of bounds
@@ -192,8 +201,12 @@ impl Framebuffer<'_> {
 }
 
 #[cfg(feature = "png-decode")]
-/// Creates a tuple containing width, height, and 0RGB encoded pixel data (encoding required by minifb) from a PNG file
-pub fn info_from_png(pngfile: &str) -> (usize, usize, Vec<u32>) {
+/// Creates a tuple containing width, height, and pixel data from a PNG file
+pub fn from_png_file(pngfile: &str, pxfmt: PixelFormat) -> (usize, usize, Vec<u32>) {
+    let shift: u32 = match pxfmt {
+        PixelFormat::Zrgb => 0,
+        PixelFormat::Rgba => 8,
+    };
     let decoder = png::Decoder::new(File::open(&pngfile).unwrap());
     let (info, mut reader) = decoder.read_info().unwrap();
     // Allocate the output buffer.
@@ -206,6 +219,7 @@ pub fn info_from_png(pngfile: &str) -> (usize, usize, Vec<u32>) {
     let u32_buffer: Vec<u32> = buf
         .chunks(3)
         .map(|v| ((v[0] as u32) << 16) | ((v[1] as u32) << 8) | v[2] as u32)
+        .map(|x| x << shift)
         .collect();
 
     (info.width as usize, info.height as usize, u32_buffer)

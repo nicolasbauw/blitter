@@ -14,7 +14,7 @@ fn main() {
     let image:  Vec<u32> =  { vec![0xffffffff; 100] };
     let image2:  Vec<u32> =  { vec![0x0000ff00; 2500] };
     let path = "resources/test-image.png";
-    let png = info_from_png(&path);
+    let png = from_png_file(&path, PixelFormat::Zrgb);
 
     // Bitmaps structs stored in a Vec, could be a hashmap, to give more easily ownership to other functions
     let mut bitmaps = Vec::new();
@@ -49,7 +49,7 @@ fn main() {
 
 // For testing : moves a 10x10 square and prints a 4x4 pixel at the center of the screen
 fn blitter_test(mut fb: &mut Framebuffer, bitmaps: &mut Vec<Bitmap>) {
-    // We clear just the animated part of the screen
+    // We just clear the animated part of the screen
     fb.clear_area(640, 10, 0, 0, 0).unwrap();
     bitmaps[0].blit(&mut fb).unwrap();
     // For illustration. It's of course not necessary to copy non-moving or non-changing bitmaps on the framebuffer at each frame.
