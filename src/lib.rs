@@ -207,15 +207,15 @@ pub fn from_png_file(pngfile: &str, pxfmt: PixelFormat) -> (usize, usize, Vec<u3
         PixelFormat::Zrgb => 0,
         PixelFormat::Rgba => 8,
     };
+    // The default output transformation is `Transformations::EXPAND | Transformations::STRIP_ALPHA`.
     let decoder = png::Decoder::new(File::open(&pngfile).unwrap());
     let (info, mut reader) = decoder.read_info().unwrap();
     // Allocate the output buffer.
     let mut buf = vec![0; info.buffer_size()];
     // Read the next frame. Currently this function should only called once.
-    // The default options
     reader.next_frame(&mut buf).unwrap();
+    
     // convert buffer to u32
-
     let u32_buffer: Vec<u32> = buf
         .chunks(3)
         .map(|v| ((v[0] as u32) << 16) | ((v[1] as u32) << 8) | v[2] as u32)
