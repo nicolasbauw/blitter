@@ -6,8 +6,9 @@
 This library performs various blitting and drawing operations on a raw 32 bits framebuffer, whatever the encoding.
 Early development.
 
-New in 0.3.0 :
-- emergency patch : BlittingBeyondBoundaries checks fixed
+New in 0.3.0:
+- BlittingBeyondBoundaries checks fixed
+- Blitting functions fixed
 - PNG feature added (WIP)
 
 Example:
