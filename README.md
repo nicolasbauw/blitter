@@ -6,6 +6,10 @@
 This library performs various blitting and drawing operations on a raw 32 bits framebuffer, whatever the encoding.
 Early development.
 
+New in 0.3.0 :
+- emergency patch : BlittingBeyondBoundaries checks fixed
+- PNG feature added (WIP)
+
 Example:
 ```
 // Framebuffer initialization
@@ -32,7 +36,8 @@ fn blitter_test(mut fb: &mut Framebuffer, bitmaps: &mut Vec<Bitmap>) {
 
 You can also view and run a (very basic) example using the [minifb library](https://crates.io/crates/minifb) in the 'examples' directory:
 ```
-cargo run --example minifb
+cargo run --example minifb --features="png-decode"
 ```
+![Screenshot](resources/screenshot.png)
 
 License: GPL-3.0
