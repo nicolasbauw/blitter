@@ -14,7 +14,7 @@ fn main() {
     let image:  Vec<u32> =  { vec![0xffffffff; 100] };
     let image2:  Vec<u32> =  { vec![0x0000ff00; 2500] };
     let path = "resources/test-image.png";
-    let png = from_png_file(&path, PixelFormat::Zrgb);
+    let png = from_png_file(&path, PixelFormat::Zrgb).unwrap();
 
     // Bitmaps structs stored in a Vec, could be a hashmap, to give more easily ownership to other functions
     let mut bitmaps = Vec::new();

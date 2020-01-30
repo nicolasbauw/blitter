@@ -31,7 +31,7 @@
 //! ```
 
 #[cfg(feature = "png-decode")]
-use std::fs::File;
+use { std::fs::File, png::DecodingError };
 use std::{fmt, result::Result};
 
 /// Output format of png decoding function
@@ -202,18 +202,18 @@ impl Framebuffer<'_> {
 
 #[cfg(feature = "png-decode")]
 /// Creates a tuple containing width, height, and pixel data from a PNG file
-pub fn from_png_file(pngfile: &str, pxfmt: PixelFormat) -> (usize, usize, Vec<u32>) {
+pub fn from_png_file(pngfile: &str, pxfmt: PixelFormat) -> Result<(usize, usize, Vec<u32>), DecodingError> {
     let shift: u32 = match pxfmt {
         PixelFormat::Zrgb => 0,
         PixelFormat::Rgba => 8,
     };
     // The default output transformation is `Transformations::EXPAND | Transformations::STRIP_ALPHA`.
-    let decoder = png::Decoder::new(File::open(&pngfile).unwrap());
-    let (info, mut reader) = decoder.read_info().unwrap();
+    let decoder = png::Decoder::new(File::open(&pngfile)?);
+    let (info, mut reader) = decoder.read_info()?;
     // Allocate the output buffer.
     let mut buf = vec![0; info.buffer_size()];
     // Read the next frame. Currently this function should only called once.
-    reader.next_frame(&mut buf).unwrap();
+    reader.next_frame(&mut buf)?;
     
     // convert buffer to u32
     let u32_buffer: Vec<u32> = buf
@@ -222,7 +222,7 @@ pub fn from_png_file(pngfile: &str, pxfmt: PixelFormat) -> (usize, usize, Vec<u3
         .map(|x| x << shift)
         .collect();
 
-    (info.width as usize, info.height as usize, u32_buffer)
+    Ok((info.width as usize, info.height as usize, u32_buffer))
 }
 
 #[cfg(test)]
