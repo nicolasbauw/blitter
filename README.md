@@ -4,12 +4,9 @@
 [![Downloads badge](https://img.shields.io/crates/d/blitter.svg)](https://crates.io/crates/blitter)
 
 This library performs various blitting and drawing operations on a raw 32 bits framebuffer, whatever the encoding.
-Early development.
 
-New in 0.3.0:
-- BlittingBeyondBoundaries checks fixed
-- Blitting functions fixed
-- PNG feature added (WIP)
+New in 0.4.0:
+- PNG decoding to RGBA (with stripped alpha) or 0RGB + error handling
 
 Example:
 ```

@@ -1,5 +1,4 @@
 //! This library performs various blitting and drawing operations on a raw 32 bits framebuffer, whatever the encoding.
-//! Early development.
 //!
 //! Example:
 //!```text
