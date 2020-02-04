@@ -82,7 +82,7 @@ pub struct Framebuffer<'a> {
 }
 
 impl Bitmap<'_> {
-    /// Copies a Bitmap to the framebuffer
+    /// Copies a bitmap to the framebuffer
     pub fn blit(&self, fb: &mut Framebuffer) -> Result<(), BlitError> {
         if (self.pixels.len() + (self.x + self.w) * (self.y + self.h) - self.w * self.h)
             > fb.pixels.len()
@@ -94,6 +94,25 @@ impl Bitmap<'_> {
             let x_offset: usize = inc_y * fb.width;
             let y_offset: usize = self.y * fb.width;
             for inc_x in 0..self.w {
+                fb.pixels[inc_x + x_offset + self.x + y_offset] = self.pixels[c];
+                c += 1;
+            }
+        }
+        Ok(())
+    }
+
+    /// Copies a portion of a bitmap to the framebuffer
+    pub fn blit_part(&self, fb: &mut Framebuffer, start_offset: usize, w: usize, h: usize) -> Result<(), BlitError> {
+        if (self.pixels.len() + (self.x + self.w) * (self.y + self.h) - self.w * self.h)
+            > fb.pixels.len()
+        {
+            return Err(BlitError::BlittingBeyondBoundaries);
+        };
+        let mut c = 0 + start_offset;
+        for inc_y in 0..h {
+            let x_offset: usize = inc_y * fb.width;
+            let y_offset: usize = self.y * fb.width;
+            for inc_x in 0..w {
                 fb.pixels[inc_x + x_offset + self.x + y_offset] = self.pixels[c];
                 c += 1;
             }
