@@ -29,9 +29,9 @@
 //! cargo run --example minifb
 //! ```
 
-#[cfg(feature = "png-decode")]
-use { std::fs::File, png::DecodingError };
 use std::{fmt, result::Result};
+#[cfg(feature = "png-decode")]
+use {png::DecodingError, std::fs::File};
 
 /// Output format of png decoding function
 #[cfg(feature = "png-decode")]
@@ -102,10 +102,14 @@ impl Bitmap<'_> {
     }
 
     /// Copies a portion of a bitmap to the framebuffer
-    pub fn blit_part(&self, fb: &mut Framebuffer, start_offset: usize, w: usize, h: usize) -> Result<(), BlitError> {
-        if (self.pixels.len() + (self.x + self.w) * (self.y + self.h) - self.w * self.h)
-            > fb.pixels.len()
-        {
+    pub fn blit_part(
+        &self,
+        fb: &mut Framebuffer,
+        start_offset: usize,
+        w: usize,
+        h: usize,
+    ) -> Result<(), BlitError> {
+        if (w * h + (self.x + w) * (self.y + h) - w * h) > fb.pixels.len() {
             return Err(BlitError::BlittingBeyondBoundaries);
         };
         let mut c = 0 + start_offset;
@@ -220,7 +224,10 @@ impl Framebuffer<'_> {
 
 #[cfg(feature = "png-decode")]
 /// Creates a tuple containing width, height, and pixel data from a PNG file
-pub fn from_png_file(pngfile: &str, pxfmt: PixelFormat) -> Result<(usize, usize, Vec<u32>), DecodingError> {
+pub fn from_png_file(
+    pngfile: &str,
+    pxfmt: PixelFormat,
+) -> Result<(usize, usize, Vec<u32>), DecodingError> {
     let shift: u32 = match pxfmt {
         PixelFormat::Zrgb => 0,
         PixelFormat::Rgba => 8,
@@ -232,7 +239,6 @@ pub fn from_png_file(pngfile: &str, pxfmt: PixelFormat) -> Result<(usize, usize,
     let mut buf = vec![0; info.buffer_size()];
     // Read the next frame. Currently this function should only called once.
     reader.next_frame(&mut buf)?;
-    
     // convert buffer to u32
     let u32_buffer: Vec<u32> = buf
         .chunks(3)
