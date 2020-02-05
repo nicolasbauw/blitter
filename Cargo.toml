@@ -1,6 +1,6 @@
 [package]
 name = "blitter"
-version = "0.4.0"
+version = "0.5.0"
 authors = ["Nicolas BAUW <nbauw@hotmail.com>"]
 edition = "2018"
 description = "This library performs various blitting and drawing operations on a 32 bits framebuffer."
@@ -16,7 +16,7 @@ readme = "README.md"
 png = { version = "0.15.3", optional = true }
 
 [dev-dependencies]
-minifb = "0.15.1"
+minifb = "0.15.3"
 
 [features]
 png-decode = ["png"]
