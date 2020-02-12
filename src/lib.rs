@@ -84,19 +84,42 @@ pub struct Framebuffer<'a> {
 impl Bitmap<'_> {
     /// Copies a bitmap to the framebuffer
     pub fn blit(&self, fb: &mut Framebuffer) -> Result<(), BlitError> {
-        if (self.pixels.len() + (self.x + self.w) * (self.y + self.h) - self.w * self.h)
+        /*if (self.pixels.len() + (self.x + self.w) * (self.y + self.h) - self.w * self.h)
             > fb.pixels.len()
         {
             return Err(BlitError::BlittingBeyondBoundaries);
-        };
+        };*/
         let mut c = 0;
-        for inc_y in 0..self.h {
+        let src_x_start;
+        let src_y_start;
+        let src_x_end;
+        let src_y_end;
+        let src_pixel_skip;
+        // No need to crop
+        if self.x + self.w <= fb.width && self.y + self.h <= fb.height {
+            src_x_start = 0;
+            src_x_end = self.w;
+            src_y_start = 0;
+            src_y_end = self.h;
+            src_pixel_skip = 0;
+            
+        }
+        // Need to crop the right of the bitmap
+        else {
+            src_x_start = 0;
+            src_x_end = fb.width-self.x;
+            src_y_start = 0;
+            src_y_end = self.h;
+            src_pixel_skip = self.w - (fb.width - self.x);
+        }
+        for inc_y in src_y_start..src_y_end {
             let x_offset: usize = inc_y * fb.width;
             let y_offset: usize = self.y * fb.width;
-            for inc_x in 0..self.w {
+            for inc_x in src_x_start..src_x_end {
                 fb.pixels[inc_x + x_offset + self.x + y_offset] = self.pixels[c];
                 c += 1;
             }
+            c+= src_pixel_skip;
         }
         Ok(())
     }
