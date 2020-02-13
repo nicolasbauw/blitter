@@ -104,12 +104,12 @@ impl Bitmap<'_> {
             src_pixel_skip = 0;
             
         }
-        // Need to crop the right of the bitmap
+        // Need to crop the right / bottom of the bitmap
         else {
             src_x_start = 0;
             src_x_end = fb.width-self.x;
             src_y_start = 0;
-            src_y_end = self.h;
+            src_y_end = fb.height - self.y;
             src_pixel_skip = self.w - (fb.width - self.x);
         }
         for inc_y in src_y_start..src_y_end {
