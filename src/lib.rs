@@ -104,13 +104,21 @@ impl Bitmap<'_> {
             src_pixel_skip = 0;
             
         }
-        // Need to crop the right / bottom of the bitmap
-        else {
+        // Need to crop the right and bottom of the bitmap
+        else if self.x + self.w > fb.width && self.y + self.h > fb.height {
             src_x_start = 0;
             src_x_end = fb.width-self.x;
             src_y_start = 0;
             src_y_end = fb.height - self.y;
             src_pixel_skip = self.w - (fb.width - self.x);
+        }
+        // Need to crop the bottom of the bitmap
+        else if self.x + self.w <= fb.width && self.y + self.h > fb.height {
+            src_x_start = 0;
+            src_x_end = self.w;
+            src_y_start = 0;
+            src_y_end = fb.height - self.y;
+            src_pixel_skip = 0;
         }
         for inc_y in src_y_start..src_y_end {
             let x_offset: usize = inc_y * fb.width;
