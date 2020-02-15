@@ -64,9 +64,9 @@ pub struct Bitmap<'a> {
     /// Bitmap height
     pub h: usize,
     /// Bitmap horizontal position
-    pub x: usize,
+    pub x: isize,
     /// Bitmap vertical position
-    pub y: usize,
+    pub y: isize,
     /// 32 bits pixel data
     pub pixels: &'a Vec<u32>,
 }
@@ -89,6 +89,8 @@ impl Bitmap<'_> {
         {
             return Err(BlitError::BlittingBeyondBoundaries);
         };*/
+        let ux = self.x as usize;
+        let uy = self.y as usize;
         let mut c = 0;
         let src_x_start;
         let src_y_start;
@@ -96,19 +98,19 @@ impl Bitmap<'_> {
         let src_y_end;
         let src_pixel_skip;
         // Need to crop the right and bottom of the bitmap
-        if self.x + self.w > fb.width && self.y + self.h > fb.height {
+        if ux + self.w > fb.width && uy + self.h > fb.height {
             src_x_start = 0;
-            src_x_end = fb.width-self.x;
+            src_x_end = fb.width-ux;
             src_y_start = 0;
-            src_y_end = fb.height - self.y;
-            src_pixel_skip = self.w - (fb.width - self.x);
+            src_y_end = fb.height - uy;
+            src_pixel_skip = self.w - (fb.width - ux);
         }
         // Need to crop the bottom of the bitmap
-        else if self.x + self.w <= fb.width && self.y + self.h > fb.height {
+        else if ux + self.w <= fb.width && uy + self.h > fb.height {
             src_x_start = 0;
             src_x_end = self.w;
             src_y_start = 0;
-            src_y_end = fb.height - self.y;
+            src_y_end = fb.height - uy;
             src_pixel_skip = 0;
         }
         // No need to crop      self.x + self.w <= fb.width && self.y + self.h <= fb.height
@@ -122,9 +124,9 @@ impl Bitmap<'_> {
         }
         for inc_y in src_y_start..src_y_end {
             let x_offset: usize = inc_y * fb.width;
-            let y_offset: usize = self.y * fb.width;
+            let y_offset: usize = uy * fb.width;
             for inc_x in src_x_start..src_x_end {
-                fb.pixels[inc_x + x_offset + self.x + y_offset] = self.pixels[c];
+                fb.pixels[inc_x + x_offset + ux + y_offset] = self.pixels[c];
                 c += 1;
             }
             c+= src_pixel_skip;
@@ -140,15 +142,17 @@ impl Bitmap<'_> {
         w: usize,
         h: usize,
     ) -> Result<(), BlitError> {
-        if (w * h + (self.x + w) * (self.y + h) - w * h) > fb.pixels.len() {
+        let ux = self.x as usize;
+        let uy = self.y as usize;
+        if (w * h + (ux + w) * (uy + h) - w * h) > fb.pixels.len() {
             return Err(BlitError::BlittingBeyondBoundaries);
         };
         let mut c = 0 + start_offset;
         for inc_y in 0..h {
             let x_offset: usize = inc_y * fb.width;
-            let y_offset: usize = self.y * fb.width;
+            let y_offset: usize = uy * fb.width;
             for inc_x in 0..w {
-                fb.pixels[inc_x + x_offset + self.x + y_offset] = self.pixels[c];
+                fb.pixels[inc_x + x_offset + ux + y_offset] = self.pixels[c];
                 c += 1;
             }
         }
@@ -157,7 +161,9 @@ impl Bitmap<'_> {
 
     /// Copies a Bitmap to the framebuffer, applying a color mask (color acting as transparent in case of non alpha framebuffers)
     pub fn blit_cmask(&self, fb: &mut Framebuffer, mask: u32) -> Result<(), BlitError> {
-        if (self.pixels.len() + (self.x + self.w) * (self.y + self.h) - self.w * self.h)
+        let ux = self.x as usize;
+        let uy = self.y as usize;
+        if (self.pixels.len() + (ux + self.w) * (uy + self.h) - self.w * self.h)
             > fb.pixels.len()
         {
             return Err(BlitError::BlittingBeyondBoundaries);
@@ -165,10 +171,10 @@ impl Bitmap<'_> {
         let mut c = 0;
         for inc_y in 0..self.h {
             let x_offset: usize = inc_y * fb.width;
-            let y_offset: usize = self.y * fb.width;
+            let y_offset: usize = uy * fb.width;
             for inc_x in 0..self.w {
                 if self.pixels[inc_x] != mask {
-                    fb.pixels[inc_x + x_offset + self.x + y_offset] = self.pixels[c];
+                    fb.pixels[inc_x + x_offset + ux + y_offset] = self.pixels[c];
                     c += 1;
                 };
             }
@@ -178,7 +184,9 @@ impl Bitmap<'_> {
 
     /// Copies a Bitmap to the framebuffer, applying a bits mask (logical AND)
     pub fn blit_lmask(&self, fb: &mut Framebuffer, mask: &Vec<bool>) -> Result<(), BlitError> {
-        if (self.pixels.len() + (self.x + self.w) * (self.y + self.h) - self.w * self.h)
+        let ux = self.x as usize;
+        let uy = self.y as usize;
+        if (self.pixels.len() + (ux + self.w) * (uy + self.h) - self.w * self.h)
             > fb.pixels.len()
         {
             return Err(BlitError::BlittingBeyondBoundaries);
@@ -186,10 +194,10 @@ impl Bitmap<'_> {
         let mut c = 0;
         for inc_y in 0..self.h {
             let x_offset: usize = inc_y * fb.width;
-            let y_offset: usize = self.y * fb.width;
+            let y_offset: usize = uy * fb.width;
             for inc_x in 0..self.w {
                 if mask[c] {
-                    fb.pixels[inc_x + x_offset + self.x + y_offset] = self.pixels[c];
+                    fb.pixels[inc_x + x_offset + ux + y_offset] = self.pixels[c];
                     c += 1;
                 };
             }
