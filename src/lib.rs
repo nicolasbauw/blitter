@@ -92,10 +92,10 @@ impl Bitmap<'_> {
         let mut c = 0;
         let cropped_x: usize;
         let cropped_y: usize;
-        let src_x_start;
-        let src_y_start;
-        let src_x_end;
-        let src_y_end;
+        let x_start;
+        let y_start;
+        let x_end;
+        let y_end;
         let src_pixel_skip;
         // Are x or y negative values ? compute cropped pixels size and convert x and y to unsigned values
         let ux = if self.x > 0 { self.x as usize } else { 0 };
@@ -104,42 +104,42 @@ impl Bitmap<'_> {
         cropped_y = self.y.abs() as usize;
         // Need to crop the top of the bitmap
         if ux + self.w <= fb.width && uy + self.h < fb.height && self.y < 0 {
-            src_x_start = 0;
-            src_x_end = self.w;
-            src_y_start = 0;
-            src_y_end = self.h - cropped_y;
+            x_start = 0;
+            x_end = self.w;
+            y_start = 0;
+            y_end = self.h - cropped_y;
             src_pixel_skip = 0;
             c = cropped_y * self.w;
         }
         // Need to crop the bottom right of the bitmap
         else if ux + self.w > fb.width && uy + self.h > fb.height {
-            src_x_start = 0;
-            src_x_end = fb.width-ux;
-            src_y_start = 0;
-            src_y_end = fb.height - uy;
+            x_start = 0;
+            x_end = fb.width-ux;
+            y_start = 0;
+            y_end = fb.height - uy;
             src_pixel_skip = self.w - (fb.width - ux);
         }
         // Need to crop the bottom of the bitmap
         else if ux + self.w <= fb.width && uy + self.h > fb.height {
-            src_x_start = 0;
-            src_x_end = self.w;
-            src_y_start = 0;
-            src_y_end = fb.height - uy;
+            x_start = 0;
+            x_end = self.w;
+            y_start = 0;
+            y_end = fb.height - uy;
             src_pixel_skip = 0;
         }
         // No need to crop      self.x + self.w <= fb.width && self.y + self.h <= fb.height
         else {
-            src_x_start = 0;
-            src_x_end = self.w;
-            src_y_start = 0;
-            src_y_end = self.h;
+            x_start = 0;
+            x_end = self.w;
+            y_start = 0;
+            y_end = self.h;
             src_pixel_skip = 0;
             
         }
-        for inc_y in src_y_start..src_y_end {
+        for inc_y in y_start..y_end {
             let x_offset: usize = inc_y * fb.width;
             let y_offset: usize = uy * fb.width;
-            for inc_x in src_x_start..src_x_end {
+            for inc_x in x_start..x_end {
                 fb.pixels[inc_x + x_offset + ux + y_offset] = self.pixels[c];
                 c += 1;
             }
