@@ -89,16 +89,30 @@ impl Bitmap<'_> {
         {
             return Err(BlitError::BlittingBeyondBoundaries);
         };*/
-        let ux = if self.x > 0 { self.x as usize } else { 0 };
-        let uy = if self.y > 0 { self.y as usize } else { 0 };
         let mut c = 0;
+        let cropped_x: usize;
+        let cropped_y: usize;
         let src_x_start;
         let src_y_start;
         let src_x_end;
         let src_y_end;
         let src_pixel_skip;
+        // Are x or y negative values ? compute cropped pixels size and convert x and y to unsigned values
+        let ux = if self.x > 0 { self.x as usize } else { 0 };
+        let uy = if self.y > 0 { self.y as usize } else { 0 };
+        cropped_x = self.x.abs() as usize;
+        cropped_y = self.y.abs() as usize;
+        // Need to crop the top of the bitmap
+        if ux + self.w <= fb.width && uy + self.h < fb.height && self.y < 0 {
+            src_x_start = 0;
+            src_x_end = self.w;
+            src_y_start = 0;
+            src_y_end = self.h - cropped_y;
+            src_pixel_skip = 0;
+            c = cropped_y * self.w;
+        }
         // Need to crop the right and bottom of the bitmap
-        if ux + self.w > fb.width && uy + self.h > fb.height {
+        else if ux + self.w > fb.width && uy + self.h > fb.height {
             src_x_start = 0;
             src_x_end = fb.width-ux;
             src_y_start = 0;
