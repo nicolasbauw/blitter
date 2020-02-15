@@ -111,7 +111,7 @@ impl Bitmap<'_> {
             src_pixel_skip = 0;
             c = cropped_y * self.w;
         }
-        // Need to crop the right and bottom of the bitmap
+        // Need to crop the bottom right of the bitmap
         else if ux + self.w > fb.width && uy + self.h > fb.height {
             src_x_start = 0;
             src_x_end = fb.width-ux;
