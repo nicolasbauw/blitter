@@ -89,8 +89,8 @@ impl Bitmap<'_> {
         {
             return Err(BlitError::BlittingBeyondBoundaries);
         };*/
-        let ux = self.x as usize;
-        let uy = self.y as usize;
+        let ux = if self.x > 0 { self.x as usize } else { 0 };
+        let uy = if self.y > 0 { self.y as usize } else { 0 };
         let mut c = 0;
         let src_x_start;
         let src_y_start;
@@ -142,8 +142,8 @@ impl Bitmap<'_> {
         w: usize,
         h: usize,
     ) -> Result<(), BlitError> {
-        let ux = self.x as usize;
-        let uy = self.y as usize;
+        let ux = if self.x > 0 { self.x as usize } else { 0 };
+        let uy = if self.y > 0 { self.y as usize } else { 0 };
         if (w * h + (ux + w) * (uy + h) - w * h) > fb.pixels.len() {
             return Err(BlitError::BlittingBeyondBoundaries);
         };
@@ -161,8 +161,8 @@ impl Bitmap<'_> {
 
     /// Copies a Bitmap to the framebuffer, applying a color mask (color acting as transparent in case of non alpha framebuffers)
     pub fn blit_cmask(&self, fb: &mut Framebuffer, mask: u32) -> Result<(), BlitError> {
-        let ux = self.x as usize;
-        let uy = self.y as usize;
+        let ux = if self.x > 0 { self.x as usize } else { 0 };
+        let uy = if self.y > 0 { self.y as usize } else { 0 };
         if (self.pixels.len() + (ux + self.w) * (uy + self.h) - self.w * self.h)
             > fb.pixels.len()
         {
@@ -184,8 +184,8 @@ impl Bitmap<'_> {
 
     /// Copies a Bitmap to the framebuffer, applying a bits mask (logical AND)
     pub fn blit_lmask(&self, fb: &mut Framebuffer, mask: &Vec<bool>) -> Result<(), BlitError> {
-        let ux = self.x as usize;
-        let uy = self.y as usize;
+        let ux = if self.x > 0 { self.x as usize } else { 0 };
+        let uy = if self.y > 0 { self.y as usize } else { 0 };
         if (self.pixels.len() + (ux + self.w) * (uy + self.h) - self.w * self.h)
             > fb.pixels.len()
         {
