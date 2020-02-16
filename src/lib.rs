@@ -103,13 +103,22 @@ impl Bitmap<'_> {
         cropped_x = self.x.abs() as usize;
         cropped_y = self.y.abs() as usize;
         // Need to crop the top of the bitmap
-        if ux + self.w <= fb.width && uy + self.h < fb.height && self.y < 0 {
+        if ux + self.w <= fb.width && uy + self.h < fb.height && self.x >= 0 && self.y < 0 {
             x_start = 0;
             x_end = self.w;
             y_start = 0;
             y_end = self.h - cropped_y;
             src_pixel_skip = 0;
             c = cropped_y * self.w;
+        }
+        // Need to crop the top left of the bitmap
+        else if ux + self.w <= fb.width && uy + self.h < fb.height && self.x < 0 && self.y < 0 {
+            x_start = 0;
+            x_end = self.w - cropped_x;
+            y_start = 0;
+            y_end = self.h - cropped_y;
+            src_pixel_skip = cropped_x;
+            c = cropped_y * self.w + cropped_x;
         }
         // Need to crop the bottom right of the bitmap
         else if ux + self.w > fb.width && uy + self.h > fb.height {
