@@ -102,6 +102,7 @@ impl Bitmap<'_> {
         cropped_y = self.y.abs() as usize;
         // Need to crop the top of the bitmap
         if ux + self.w <= fb.width && uy + self.h < fb.height && self.x >= 0 && self.y < 0 {
+            println!("Cropping top");
             x_end = self.w;
             y_end = self.h - cropped_y;
             src_pixel_skip = 0;
@@ -109,6 +110,7 @@ impl Bitmap<'_> {
         }
         // Need to crop the top left of the bitmap
         else if ux + self.w <= fb.width && uy + self.h < fb.height && self.x < 0 && self.y < 0 {
+            println!("Cropping top left");
             x_end = self.w - cropped_x;
             y_end = self.h - cropped_y;
             src_pixel_skip = cropped_x;
@@ -116,13 +118,15 @@ impl Bitmap<'_> {
         }
         // Need to crop the top right of the bitmap
         else if ux + self.w > fb.width && uy + self.h < fb.height && ux + self.w > fb.width && self.y < 0 {
+            println!("Cropping top right");
             x_end = fb.width - ux;
             y_end = self.h - cropped_y;
             src_pixel_skip = self.w - (fb.width - ux);
             c = cropped_y * self.w;
         }
         // Need to crop the bottom left of the bitmap
-        else if ux + self.w <= fb.width && uy + self.h > fb.height && self.x < 0 {
+        else if uy + self.h > fb.height && self.x < 0 {
+            println!("Cropping bottom left");
             x_end = self.w - cropped_x;
             y_end = fb.height - uy;
             src_pixel_skip = cropped_x;
@@ -130,15 +134,25 @@ impl Bitmap<'_> {
         }
         // Need to crop the bottom right of the bitmap
         else if ux + self.w > fb.width && uy + self.h > fb.height {
+            println!("Cropping bottom right");
             x_end = fb.width-ux;
             y_end = fb.height - uy;
             src_pixel_skip = self.w - (fb.width - ux);
         }
         // Need to crop the bottom of the bitmap
         else if ux + self.w <= fb.width && uy + self.h > fb.height {
+            println!("Cropping bottom");
             x_end = self.w;
             y_end = fb.height - uy;
             src_pixel_skip = 0;
+        }
+        // Need to crop the left of the bitmap
+        else if self.x < 0 {
+            println!("Cropping left");
+            x_end = self.w - cropped_x;
+            y_end = self.h;
+            src_pixel_skip = cropped_x;
+            c = cropped_x;
         }
         // No need to crop      self.x + self.w <= fb.width && self.y + self.h <= fb.height
         else {
