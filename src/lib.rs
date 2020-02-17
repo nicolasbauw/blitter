@@ -92,8 +92,6 @@ impl Bitmap<'_> {
         let mut c = 0;
         let cropped_x: usize;
         let cropped_y: usize;
-        let x_start;
-        let y_start;
         let x_end;
         let y_end;
         let src_pixel_skip;
@@ -104,69 +102,55 @@ impl Bitmap<'_> {
         cropped_y = self.y.abs() as usize;
         // Need to crop the top of the bitmap
         if ux + self.w <= fb.width && uy + self.h < fb.height && self.x >= 0 && self.y < 0 {
-            x_start = 0;
             x_end = self.w;
-            y_start = 0;
             y_end = self.h - cropped_y;
             src_pixel_skip = 0;
             c = cropped_y * self.w;
         }
         // Need to crop the top left of the bitmap
         else if ux + self.w <= fb.width && uy + self.h < fb.height && self.x < 0 && self.y < 0 {
-            x_start = 0;
             x_end = self.w - cropped_x;
-            y_start = 0;
             y_end = self.h - cropped_y;
             src_pixel_skip = cropped_x;
             c = cropped_y * self.w + cropped_x;
         }
         // Need to crop the top right of the bitmap
         else if ux + self.w > fb.width && uy + self.h < fb.height && ux + self.w > fb.width && self.y < 0 {
-            x_start = 0;
             x_end = fb.width - ux;
-            y_start = 0;
             y_end = self.h - cropped_y;
             src_pixel_skip = self.w - (fb.width - ux);
             c = cropped_y * self.w;
         }
         // Need to crop the bottom left of the bitmap
         else if ux + self.w <= fb.width && uy + self.h > fb.height && self.x < 0 {
-            x_start = 0;
             x_end = self.w - cropped_x;
-            y_start = 0;
             y_end = fb.height - uy;
             src_pixel_skip = cropped_x;
             c = cropped_x;
         }
         // Need to crop the bottom right of the bitmap
         else if ux + self.w > fb.width && uy + self.h > fb.height {
-            x_start = 0;
             x_end = fb.width-ux;
-            y_start = 0;
             y_end = fb.height - uy;
             src_pixel_skip = self.w - (fb.width - ux);
         }
         // Need to crop the bottom of the bitmap
         else if ux + self.w <= fb.width && uy + self.h > fb.height {
-            x_start = 0;
             x_end = self.w;
-            y_start = 0;
             y_end = fb.height - uy;
             src_pixel_skip = 0;
         }
         // No need to crop      self.x + self.w <= fb.width && self.y + self.h <= fb.height
         else {
-            x_start = 0;
             x_end = self.w;
-            y_start = 0;
             y_end = self.h;
             src_pixel_skip = 0;
             
         }
-        for inc_y in y_start..y_end {
+        for inc_y in 0..y_end {
             let x_offset: usize = inc_y * fb.width;
             let y_offset: usize = uy * fb.width;
-            for inc_x in x_start..x_end {
+            for inc_x in 0..x_end {
                 fb.pixels[inc_x + x_offset + ux + y_offset] = self.pixels[c];
                 c += 1;
             }
