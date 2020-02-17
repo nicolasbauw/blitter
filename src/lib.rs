@@ -201,6 +201,7 @@ impl Bitmap<'_> {
                 fb.pixels[inc_x + x_offset + ux + y_offset] = self.pixels[c];
                 c += 1;
             }
+            c += self.w - w;
         }
         Ok(())
     }
