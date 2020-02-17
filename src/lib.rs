@@ -129,6 +129,15 @@ impl Bitmap<'_> {
             src_pixel_skip = self.w - (fb.width - ux);
             c = cropped_y * self.w;
         }
+        // Need to crop the bottom left of the bitmap
+        else if ux + self.w <= fb.width && uy + self.h > fb.height && self.x < 0 {
+            x_start = 0;
+            x_end = self.w - cropped_x;
+            y_start = 0;
+            y_end = fb.height - uy;
+            src_pixel_skip = cropped_x;
+            c = cropped_x;
+        }
         // Need to crop the bottom right of the bitmap
         else if ux + self.w > fb.width && uy + self.h > fb.height {
             x_start = 0;
