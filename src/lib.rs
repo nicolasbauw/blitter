@@ -109,7 +109,7 @@ impl Bitmap<'_> {
             c = cropped_y * self.w;
         }
         // Need to crop the top left of the bitmap
-        else if ux + self.w <= fb.width && uy + self.h < fb.height && self.x < 0 && self.y < 0 {
+        else if self.x < 0 && self.y < 0 {
             println!("Cropping top left");
             x_end = self.w - cropped_x;
             y_end = self.h - cropped_y;
@@ -117,7 +117,7 @@ impl Bitmap<'_> {
             c = cropped_y * self.w + cropped_x;
         }
         // Need to crop the top right of the bitmap
-        else if ux + self.w > fb.width && uy + self.h < fb.height && ux + self.w > fb.width && self.y < 0 {
+        else if ux + self.w > fb.width && ux + self.w > fb.width && self.y < 0 {
             println!("Cropping top right");
             x_end = fb.width - ux;
             y_end = self.h - cropped_y;
@@ -155,7 +155,7 @@ impl Bitmap<'_> {
             c = cropped_x;
         }
         // Need to crop the right of the bitmap
-        else if ux + self.w > fb.width {
+        else if ux + self.w > fb.width && self.y >= 0 {
             println!("Cropping right");
             x_end = fb.width-ux;
             y_end = self.h;
