@@ -194,7 +194,7 @@ impl Bitmap<'_> {
             })
         }
         // Need to crop the top left of the bitmap
-        else if self.x < 0 && self.y < 0 {
+        else if self.x < 0 && self.y < 0 && self.x + self.w as isize > 0 {
             println!("Cropping top left");
             Some(Croppedcoords {
                 x_end: self.w - cropped_x,
@@ -206,7 +206,7 @@ impl Bitmap<'_> {
             })
         }
         // Need to crop the top right of the bitmap
-        else if ux + self.w > fb.width && ux + self.w > fb.width && self.y < 0 {
+        else if ux + self.w > fb.width && ux + self.w > fb.width && self.y < 0 && ux + self.w < fb.width {
             println!("Cropping top right");
             Some(Croppedcoords {
                 x_end: fb.width - ux,
@@ -218,7 +218,7 @@ impl Bitmap<'_> {
             })
         }
         // Need to crop the bottom left of the bitmap
-        else if uy + self.h > fb.height && self.x < 0 {
+        else if uy + self.h > fb.height && self.x < 0 && self.x + self.w as isize > 0{
             println!("Cropping bottom left");
             Some(Croppedcoords {
                 x_end: self.w - cropped_x,
@@ -230,7 +230,7 @@ impl Bitmap<'_> {
             })
         }
         // Need to crop the bottom right of the bitmap
-        else if ux + self.w > fb.width && uy + self.h > fb.height {
+        else if ux + self.w > fb.width && uy + self.h > fb.height && ux < fb.width {
             println!("Cropping bottom right");
             Some(Croppedcoords {
                 x_end: fb.width - ux,
@@ -266,7 +266,7 @@ impl Bitmap<'_> {
             })
         }
         // Need to crop the right of the bitmap
-        else if ux + self.w > fb.width && self.y >= 0 && ux <= fb.width {
+        else if ux + self.w > fb.width && self.y >= 0 && ux <= fb.width && uy + self.h < fb.height {
             println!("Cropping right");
             Some(Croppedcoords {
                 x_end: fb.width - ux,
