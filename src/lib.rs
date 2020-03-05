@@ -93,13 +93,16 @@ struct Croppedcoords {
     // Pixel counter / start offset
     c: usize,
     // Pixel skip of source bitmap
-    src_pixel_skip: usize
+    src_pixel_skip: usize,
 }
 
 impl Bitmap<'_> {
     /// Copies a bitmap to the framebuffer
     pub fn blit(&self, fb: &mut Framebuffer) {
-        let mut cr = self.compute_crop(fb);
+        let mut cr = match self.compute_crop(fb) {
+            Some(c) => c,
+            None => return
+        };
         for inc_y in 0..cr.y_end {
             let x_offset: usize = inc_y * fb.width;
             let y_offset: usize = cr.uy * fb.width;
@@ -112,29 +115,22 @@ impl Bitmap<'_> {
     }
 
     /// Copies a portion of a bitmap to the framebuffer
-    pub fn blit_part(
-        &self,
-        fb: &mut Framebuffer,
-        start_offset: usize,
-        w: usize,
-        h: usize,
-    ) -> Result<(), BlitError> {
-        let ux = if self.x > 0 { self.x as usize } else { 0 };
-        let uy = if self.y > 0 { self.y as usize } else { 0 };
-        if (w * h + (ux + w) * (uy + h) - w * h) > fb.pixels.len() {
-            return Err(BlitError::BlittingBeyondBoundaries);
-        };
+    pub fn blit_part(&self, fb: &mut Framebuffer, start_offset: usize, w: usize, h: usize) {
         let mut c = 0 + start_offset;
+        let mut t_pixels = vec![0; w * h];
         for inc_y in 0..h {
-            let x_offset: usize = inc_y * fb.width;
-            let y_offset: usize = uy * fb.width;
             for inc_x in 0..w {
-                fb.pixels[inc_x + x_offset + ux + y_offset] = self.pixels[c];
+                t_pixels[inc_x + inc_y * w ] = self.pixels[c];
                 c += 1;
             }
             c += self.w - w;
         }
-        Ok(())
+        let tx = self.x;
+        let ty = self.y;
+        let tw = w;
+        let th = h;
+        let t = Bitmap { x: tx, y: ty, w: tw, h: th, pixels: &t_pixels};
+        t.blit(fb);
     }
 
     /// Copies a Bitmap to the framebuffer, applying a color mask (color acting as transparent in case of non alpha framebuffers)
@@ -179,7 +175,7 @@ impl Bitmap<'_> {
         Ok(())
     }
 
-    fn compute_crop(&self, fb: &Framebuffer) -> Croppedcoords {
+    fn compute_crop(&self, fb: &Framebuffer) -> Option<Croppedcoords> {
         // Are x or y negative values ? compute cropped pixels size and convert x and y to unsigned values
         let ux = if self.x > 0 { self.x as usize } else { 0 };
         let uy = if self.y > 0 { self.y as usize } else { 0 };
@@ -188,113 +184,117 @@ impl Bitmap<'_> {
         // Need to crop the top of the bitmap
         let r = if ux + self.w <= fb.width && uy + self.h < fb.height && self.x >= 0 && self.y < 0 {
             println!("Cropping top");
-            Croppedcoords {
-            x_end: self.w,
-            y_end: self.h - cropped_y,
-            src_pixel_skip: 0,
-            c: cropped_y * self.w,
-            ux: ux,
-            uy: uy
-            }
+            Some(Croppedcoords {
+                x_end: self.w,
+                y_end: self.h - cropped_y,
+                src_pixel_skip: 0,
+                c: cropped_y * self.w,
+                ux: ux,
+                uy: uy,
+            })
         }
         // Need to crop the top left of the bitmap
         else if self.x < 0 && self.y < 0 {
             println!("Cropping top left");
-            Croppedcoords {
-            x_end: self.w - cropped_x,
-            y_end: self.h - cropped_y,
-            src_pixel_skip: cropped_x,
-            c: cropped_y * self.w + cropped_x,
-            ux: ux,
-            uy: uy
-            }
+            Some(Croppedcoords {
+                x_end: self.w - cropped_x,
+                y_end: self.h - cropped_y,
+                src_pixel_skip: cropped_x,
+                c: cropped_y * self.w + cropped_x,
+                ux: ux,
+                uy: uy,
+            })
         }
         // Need to crop the top right of the bitmap
         else if ux + self.w > fb.width && ux + self.w > fb.width && self.y < 0 {
             println!("Cropping top right");
-            Croppedcoords {
-            x_end: fb.width - ux,
-            y_end: self.h - cropped_y,
-            src_pixel_skip: self.w - (fb.width - ux),
-            c: cropped_y * self.w,
-            ux: ux,
-            uy: uy
-            }
+            Some(Croppedcoords {
+                x_end: fb.width - ux,
+                y_end: self.h - cropped_y,
+                src_pixel_skip: self.w - (fb.width - ux),
+                c: cropped_y * self.w,
+                ux: ux,
+                uy: uy,
+            })
         }
         // Need to crop the bottom left of the bitmap
         else if uy + self.h > fb.height && self.x < 0 {
             println!("Cropping bottom left");
-            Croppedcoords {
-            x_end: self.w - cropped_x,
-            y_end: fb.height - uy,
-            src_pixel_skip: cropped_x,
-            c: cropped_x,
-            ux: ux,
-            uy: uy
-            }
+            Some(Croppedcoords {
+                x_end: self.w - cropped_x,
+                y_end: fb.height - uy,
+                src_pixel_skip: cropped_x,
+                c: cropped_x,
+                ux: ux,
+                uy: uy,
+            })
         }
         // Need to crop the bottom right of the bitmap
         else if ux + self.w > fb.width && uy + self.h > fb.height {
             println!("Cropping bottom right");
-            Croppedcoords {
-            x_end: fb.width - ux,
-            y_end: fb.height - uy,
-            src_pixel_skip: self.w - (fb.width - ux),
-            c: 0,
-            ux: ux,
-            uy: uy
-            }
+            Some(Croppedcoords {
+                x_end: fb.width - ux,
+                y_end: fb.height - uy,
+                src_pixel_skip: self.w - (fb.width - ux),
+                c: 0,
+                ux: ux,
+                uy: uy,
+            })
         }
         // Need to crop the bottom of the bitmap
         else if ux + self.w <= fb.width && uy + self.h > fb.height {
             println!("Cropping bottom");
-            Croppedcoords {
-            x_end: self.w,
-            y_end: fb.height - uy,
-            src_pixel_skip: 0,
-            c: 0,
-            ux:ux,
-            uy: uy
-            }
+            Some(Croppedcoords {
+                x_end: self.w,
+                y_end: fb.height - uy,
+                src_pixel_skip: 0,
+                c: 0,
+                ux: ux,
+                uy: uy,
+            })
         }
         // Need to crop the left of the bitmap
         else if self.x < 0 {
             println!("Cropping left");
-            Croppedcoords {
-            x_end: self.w - cropped_x,
-            y_end: self.h,
-            src_pixel_skip: cropped_x,
-            c: cropped_x,
-            ux: ux,
-            uy: uy
-            }
+            Some(Croppedcoords {
+                x_end: self.w - cropped_x,
+                y_end: self.h,
+                src_pixel_skip: cropped_x,
+                c: cropped_x,
+                ux: ux,
+                uy: uy,
+            })
         }
         // Need to crop the right of the bitmap
-        else if ux + self.w > fb.width && self.y >= 0 {
+        else if ux + self.w > fb.width && self.y >= 0 && ux <= fb.width {
             println!("Cropping right");
-            Croppedcoords {
-            x_end: fb.width - ux,
-            y_end: self.h,
-            src_pixel_skip: self.w - (fb.width - ux),
-            c: 0,
-            ux: ux,
-            uy: uy
-            }
+            Some(Croppedcoords {
+                x_end: fb.width - ux,
+                y_end: self.h,
+                src_pixel_skip: self.w - (fb.width - ux),
+                c: 0,
+                ux: ux,
+                uy: uy,
+            })
+        }
+        // Blitting outside the screen -> no need to blit anything
+        else if ux > fb.width || uy > fb.height {
+            println!("Outside framebuffer");
+            None
         }
         // No need to crop      self.x + self.w <= fb.width && self.y + self.h <= fb.height
         else {
-            Croppedcoords {
-            x_end: self.w,
-            y_end: self.h,
-            src_pixel_skip: 0,
-            c: 0,
-            ux: ux,
-            uy: uy
-            }
+            Some(Croppedcoords {
+                x_end: self.w,
+                y_end: self.h,
+                src_pixel_skip: 0,
+                c: 0,
+                ux: ux,
+                uy: uy,
+            })
         };
         r
     }
-    
 }
 
 impl Framebuffer<'_> {
