@@ -254,7 +254,7 @@ impl Bitmap<'_> {
             })
         }
         // Need to crop the left of the bitmap
-        else if self.x < 0 {
+        else if self.x < 0 && self.x + self.w as isize > 0 {
             println!("Cropping left");
             Some(Croppedcoords {
                 x_end: self.w - cropped_x,
