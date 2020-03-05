@@ -51,10 +51,10 @@ fn main() {
 fn blitter_test(mut fb: &mut Framebuffer, bitmaps: &mut Vec<Bitmap>) {
     // We just clear the animated part of the screen
     fb.clear_area(640, 10, 0, 0, 0).unwrap();
-    bitmaps[0].blit(&mut fb).unwrap();
+    bitmaps[0].blit(&mut fb);
     // For illustration. It's of course not necessary to copy non-moving or non-changing bitmaps on the framebuffer at each frame.
-    bitmaps[1].blit(&mut fb).unwrap();
-    bitmaps[2].blit(&mut fb).unwrap();
+    bitmaps[1].blit(&mut fb);
+    bitmaps[2].blit(&mut fb);
     if bitmaps[0].x < WIDTH as isize - 10 { bitmaps[0].x = bitmaps[0].x+3; }
     fb.draw_fatpixel(WIDTH/2, HEIGHT/2, 4, 0xffffffff).unwrap();
 }

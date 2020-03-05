@@ -98,7 +98,7 @@ struct Croppedcoords {
 
 impl Bitmap<'_> {
     /// Copies a bitmap to the framebuffer
-    pub fn blit(&self, fb: &mut Framebuffer) -> Result<(), BlitError> {
+    pub fn blit(&self, fb: &mut Framebuffer) {
         let mut cr = self.compute_crop(fb);
         for inc_y in 0..cr.y_end {
             let x_offset: usize = inc_y * fb.width;
@@ -109,7 +109,6 @@ impl Bitmap<'_> {
             }
             cr.c += cr.src_pixel_skip;
         }
-        Ok(())
     }
 
     /// Copies a portion of a bitmap to the framebuffer
