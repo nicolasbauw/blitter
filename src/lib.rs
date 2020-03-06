@@ -117,6 +117,7 @@ impl Bitmap<'_> {
     /// Copies a portion of a bitmap to the framebuffer
     pub fn blit_part(&self, fb: &mut Framebuffer, start_offset: usize, w: usize, h: usize) {
         let mut c = 0 + start_offset;
+        // Temporary pixel buffer
         let mut t_pixels = vec![0; w * h];
         for inc_y in 0..h {
             for inc_x in 0..w {
@@ -125,6 +126,7 @@ impl Bitmap<'_> {
             }
             c += self.w - w;
         }
+        // Temporary Bitmap; this way we can use the generic blit function
         let tx = self.x;
         let ty = self.y;
         let tw = w;
@@ -183,7 +185,7 @@ impl Bitmap<'_> {
         let cropped_y = self.y.abs() as usize;
         // Need to crop the top of the bitmap
         let r = if ux + self.w <= fb.width && uy + self.h < fb.height && self.x >= 0 && self.y < 0 && (self.y + self.h as isize) > 0 {
-            println!("Cropping top");
+            //println!("Cropping top");
             Some(Croppedcoords {
                 x_end: self.w,
                 y_end: self.h - cropped_y,
@@ -195,7 +197,7 @@ impl Bitmap<'_> {
         }
         // Need to crop the top left of the bitmap
         else if self.x < 0 && self.y < 0 && self.x + self.w as isize > 0 {
-            println!("Cropping top left");
+            //println!("Cropping top left");
             Some(Croppedcoords {
                 x_end: self.w - cropped_x,
                 y_end: self.h - cropped_y,
@@ -207,7 +209,7 @@ impl Bitmap<'_> {
         }
         // Need to crop the top right of the bitmap
         else if ux + self.w > fb.width && ux < fb.width && self.y < 0 && self.y + self.h as isize > 0 {
-            println!("Cropping top right");
+            //println!("Cropping top right");
             Some(Croppedcoords {
                 x_end: fb.width - ux,
                 y_end: self.h - cropped_y,
@@ -219,7 +221,7 @@ impl Bitmap<'_> {
         }
         // Need to crop the bottom left of the bitmap
         else if uy + self.h > fb.height && self.x < 0 && self.x + self.w as isize > 0{
-            println!("Cropping bottom left");
+            //println!("Cropping bottom left");
             Some(Croppedcoords {
                 x_end: self.w - cropped_x,
                 y_end: fb.height - uy,
@@ -231,7 +233,7 @@ impl Bitmap<'_> {
         }
         // Need to crop the bottom right of the bitmap
         else if ux + self.w > fb.width && uy + self.h > fb.height && ux < fb.width {
-            println!("Cropping bottom right");
+            //println!("Cropping bottom right");
             Some(Croppedcoords {
                 x_end: fb.width - ux,
                 y_end: fb.height - uy,
@@ -243,7 +245,7 @@ impl Bitmap<'_> {
         }
         // Need to crop the bottom of the bitmap
         else if ux + self.w < fb.width && self.x + self.w as isize > 0 && uy + self.h > fb.height {
-            println!("Cropping bottom");
+            //println!("Cropping bottom");
             Some(Croppedcoords {
                 x_end: self.w,
                 y_end: fb.height - uy,
@@ -255,7 +257,7 @@ impl Bitmap<'_> {
         }
         // Need to crop the left of the bitmap
         else if self.x < 0 && self.x + self.w as isize > 0 {
-            println!("Cropping left");
+            //println!("Cropping left");
             Some(Croppedcoords {
                 x_end: self.w - cropped_x,
                 y_end: self.h,
@@ -267,7 +269,7 @@ impl Bitmap<'_> {
         }
         // Need to crop the right of the bitmap
         else if ux + self.w > fb.width && self.y >= 0 && ux <= fb.width && uy + self.h < fb.height {
-            println!("Cropping right");
+            //println!("Cropping right");
             Some(Croppedcoords {
                 x_end: fb.width - ux,
                 y_end: self.h,
@@ -279,12 +281,12 @@ impl Bitmap<'_> {
         }
         // Blitting outside the screen -> no need to blit anything
         else if ux > fb.width || uy > fb.height || (self.x + self.w as isize) < 0 || (self.y + self.h as isize) < 0 {
-            println!("Outside framebuffer");
+            //println!("Outside framebuffer");
             None
         }
         // No need to crop      self.x + self.w <= fb.width && self.y + self.h <= fb.height
         else {
-            println!("No cropping");
+            //println!("No cropping");
             Some(Croppedcoords {
                 x_end: self.w,
                 y_end: self.h,
