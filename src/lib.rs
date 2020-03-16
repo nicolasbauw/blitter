@@ -99,7 +99,7 @@ struct Croppedcoords {
 impl Bitmap<'_> {
     /// Copies a bitmap to the framebuffer
     pub fn blit(&self, fb: &mut Framebuffer) {
-        let mut cr = match self.compute_crop(fb) {
+        let mut cr = match self.compute_clipping(fb) {
             Some(c) => c,
             None => return
         };
@@ -177,7 +177,7 @@ impl Bitmap<'_> {
         Ok(())
     }
 
-    fn compute_crop(&self, fb: &Framebuffer) -> Option<Croppedcoords> {
+    fn compute_clipping(&self, fb: &Framebuffer) -> Option<Croppedcoords> {
         // Are x or y negative values ? compute cropped pixels size and convert x and y to unsigned values
         let ux = if self.x > 0 { self.x as usize } else { 0 };
         let uy = if self.y > 0 { self.y as usize } else { 0 };
