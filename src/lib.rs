@@ -81,7 +81,7 @@ pub struct Framebuffer<'a> {
     pub pixels: &'a mut Vec<u32>,
 }
 
-struct Croppedcoords {
+struct ClippedCoords {
     // Non negative x coordinate
     ux: usize,
     // Non negative y coordinate
@@ -177,7 +177,7 @@ impl Bitmap<'_> {
         Ok(())
     }
 
-    fn compute_clipping(&self, fb: &Framebuffer) -> Option<Croppedcoords> {
+    fn compute_clipping(&self, fb: &Framebuffer) -> Option<ClippedCoords> {
         // Are x or y negative values ? compute cropped pixels size and convert x and y to unsigned values
         let ux = if self.x > 0 { self.x as usize } else { 0 };
         let uy = if self.y > 0 { self.y as usize } else { 0 };
@@ -186,7 +186,7 @@ impl Bitmap<'_> {
         // Need to crop the top of the bitmap
         let r = if ux + self.w <= fb.width && uy + self.h < fb.height && self.x >= 0 && self.y < 0 && (self.y + self.h as isize) > 0 {
             //println!("Cropping top");
-            Some(Croppedcoords {
+            Some(ClippedCoords {
                 x_end: self.w,
                 y_end: self.h - cropped_y,
                 src_pixel_skip: 0,
@@ -198,7 +198,7 @@ impl Bitmap<'_> {
         // Need to crop the top left of the bitmap
         else if self.x < 0 && self.y < 0 && self.x + self.w as isize > 0 {
             //println!("Cropping top left");
-            Some(Croppedcoords {
+            Some(ClippedCoords {
                 x_end: self.w - cropped_x,
                 y_end: self.h - cropped_y,
                 src_pixel_skip: cropped_x,
@@ -210,7 +210,7 @@ impl Bitmap<'_> {
         // Need to crop the top right of the bitmap
         else if ux + self.w > fb.width && ux < fb.width && self.y < 0 && self.y + self.h as isize > 0 {
             //println!("Cropping top right");
-            Some(Croppedcoords {
+            Some(ClippedCoords {
                 x_end: fb.width - ux,
                 y_end: self.h - cropped_y,
                 src_pixel_skip: self.w - (fb.width - ux),
@@ -222,7 +222,7 @@ impl Bitmap<'_> {
         // Need to crop the bottom left of the bitmap
         else if uy + self.h > fb.height && self.x < 0 && self.x + self.w as isize > 0{
             //println!("Cropping bottom left");
-            Some(Croppedcoords {
+            Some(ClippedCoords {
                 x_end: self.w - cropped_x,
                 y_end: fb.height - uy,
                 src_pixel_skip: cropped_x,
@@ -234,7 +234,7 @@ impl Bitmap<'_> {
         // Need to crop the bottom right of the bitmap
         else if ux + self.w > fb.width && uy + self.h > fb.height && ux < fb.width {
             //println!("Cropping bottom right");
-            Some(Croppedcoords {
+            Some(ClippedCoords {
                 x_end: fb.width - ux,
                 y_end: fb.height - uy,
                 src_pixel_skip: self.w - (fb.width - ux),
@@ -246,7 +246,7 @@ impl Bitmap<'_> {
         // Need to crop the bottom of the bitmap
         else if ux + self.w < fb.width && self.x + self.w as isize > 0 && uy + self.h > fb.height {
             //println!("Cropping bottom");
-            Some(Croppedcoords {
+            Some(ClippedCoords {
                 x_end: self.w,
                 y_end: fb.height - uy,
                 src_pixel_skip: 0,
@@ -258,7 +258,7 @@ impl Bitmap<'_> {
         // Need to crop the left of the bitmap
         else if self.x < 0 && self.x + self.w as isize > 0 {
             //println!("Cropping left");
-            Some(Croppedcoords {
+            Some(ClippedCoords {
                 x_end: self.w - cropped_x,
                 y_end: self.h,
                 src_pixel_skip: cropped_x,
@@ -270,7 +270,7 @@ impl Bitmap<'_> {
         // Need to crop the right of the bitmap
         else if ux + self.w > fb.width && self.y >= 0 && ux <= fb.width && uy + self.h < fb.height {
             //println!("Cropping right");
-            Some(Croppedcoords {
+            Some(ClippedCoords {
                 x_end: fb.width - ux,
                 y_end: self.h,
                 src_pixel_skip: self.w - (fb.width - ux),
@@ -287,7 +287,7 @@ impl Bitmap<'_> {
         // No need to crop      self.x + self.w <= fb.width && self.y + self.h <= fb.height
         else {
             //println!("No cropping");
-            Some(Croppedcoords {
+            Some(ClippedCoords {
                 x_end: self.w,
                 y_end: self.h,
                 src_pixel_skip: 0,
