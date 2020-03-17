@@ -332,7 +332,7 @@ impl Framebuffer<'_> {
 
     /// Drawing a pixel
     pub fn draw_pixel(&mut self, x: usize, y: usize, color: u32) -> Result<(), BlitError> {
-        if x > self.width && y > self.height {
+        if x > self.width || y > self.height {
             return Err(BlitError::BlittingBeyondBoundaries);
         };
         self.pixels[x + y * self.width] = color;
@@ -347,7 +347,7 @@ impl Framebuffer<'_> {
         size: usize,
         color: u32,
     ) -> Result<(), BlitError> {
-        if x > self.width - size && y > self.height - size {
+        if x > self.width - size || y > self.height - size {
             return Err(BlitError::BlittingBeyondBoundaries);
         };
         self.clear_area(size, size, x, y, color)?;
