@@ -82,9 +82,9 @@ pub struct Framebuffer<'a> {
 }
 
 struct ClippedCoords {
-    // Non negative x coordinate
+    // Non negative (unsigned) x coordinate
     ux: usize,
-    // Non negative y coordinate
+    // Non negative (unsigned) y coordinate
     uy: usize,
     // End of blit, x axis
     x_end: usize,
