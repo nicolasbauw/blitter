@@ -196,7 +196,7 @@ impl Bitmap<'_> {
             })
         }
         // Need to crop the top left of the bitmap
-        else if self.x < 0 && self.y < 0 && self.x + self.w as isize > 0 {
+        else if self.x < 0 && self.y < 0 && self.x + self.w as isize > 0 && self.y + self.h as isize > 0 {
             //println!("Cropping top left");
             Some(ClippedCoords {
                 x_end: self.w - cropped_x,
@@ -220,7 +220,7 @@ impl Bitmap<'_> {
             })
         }
         // Need to crop the bottom left of the bitmap
-        else if uy + self.h > fb.height && self.x < 0 && self.x + self.w as isize > 0{
+        else if uy + self.h > fb.height && self.x < 0 && self.x + self.w as isize > 0 && uy < fb.height {
             //println!("Cropping bottom left");
             Some(ClippedCoords {
                 x_end: self.w - cropped_x,
@@ -232,7 +232,7 @@ impl Bitmap<'_> {
             })
         }
         // Need to crop the bottom right of the bitmap
-        else if ux + self.w > fb.width && uy + self.h > fb.height && ux < fb.width {
+        else if ux + self.w > fb.width && uy + self.h > fb.height && ux < fb.width && uy < fb.height {
             //println!("Cropping bottom right");
             Some(ClippedCoords {
                 x_end: fb.width - ux,
@@ -244,7 +244,7 @@ impl Bitmap<'_> {
             })
         }
         // Need to crop the bottom of the bitmap
-        else if ux + self.w < fb.width && self.x + self.w as isize > 0 && uy + self.h > fb.height {
+        else if ux + self.w < fb.width && self.x + self.w as isize > 0 && uy + self.h > fb.height && uy < fb.height {
             //println!("Cropping bottom");
             Some(ClippedCoords {
                 x_end: self.w,
@@ -256,7 +256,7 @@ impl Bitmap<'_> {
             })
         }
         // Need to crop the left of the bitmap
-        else if self.x < 0 && self.x + self.w as isize > 0 {
+        else if self.x < 0 && self.x + self.w as isize > 0 && self.y > 0 && uy < fb.height {
             //println!("Cropping left");
             Some(ClippedCoords {
                 x_end: self.w - cropped_x,
