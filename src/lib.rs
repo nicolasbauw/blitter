@@ -42,6 +42,14 @@ pub enum PixelFormat {
     Rgba,
 }
 
+/// Mask applied to blitting operations
+pub enum Mask<'a> {
+    /// Color mask
+    Color(u32),
+    /// Bits mask
+    Bits(&'a Vec<bool>)
+}
+
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum BlitError {
     // Index out of bounds
