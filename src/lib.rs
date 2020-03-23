@@ -117,10 +117,11 @@ impl Bitmap<'_> {
             let x_offset: usize = inc_y * fb.width;
             let y_offset: usize = cr.uy * fb.width;
             for inc_x in 0..cr.x_end {
+                let pixel_copy = { fb.pixels[inc_x + x_offset + cr.ux + y_offset] = self.pixels[cr.c] };
                 match mask {
-                    Mask::Color(c) => if self.pixels[cr.c] != c { fb.pixels[inc_x + x_offset + cr.ux + y_offset] = self.pixels[cr.c] },
-                    Mask::Bits(b) => if b[cr.c] { fb.pixels[inc_x + x_offset + cr.ux + y_offset] = self.pixels[cr.c] }
-                    Mask::None => fb.pixels[inc_x + x_offset + cr.ux + y_offset] = self.pixels[cr.c]
+                    Mask::Color(c) => if self.pixels[cr.c] != c { pixel_copy },
+                    Mask::Bits(b) => if b[cr.c] { pixel_copy }
+                    Mask::None => pixel_copy
                 }
                 cr.c += 1;
             }
