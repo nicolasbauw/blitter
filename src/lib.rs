@@ -44,10 +44,12 @@ pub enum PixelFormat {
 
 /// Mask applied to blitting operations
 pub enum Mask<'a> {
-    /// Color mask
+    /// color mask (color acting as transparent in case of non alpha framebuffers)
     Color(u32),
-    /// Bits mask
-    Bits(&'a Vec<bool>)
+    /// Bits mask (logical AND)
+    Bits(&'a Vec<bool>),
+    /// No mask
+    None
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -105,8 +107,8 @@ struct ClippedCoords {
 }
 
 impl Bitmap<'_> {
-    /// Copies a bitmap to the framebuffer
-    pub fn blit(&self, fb: &mut Framebuffer) {
+    /// Copies a bitmap to the framebuffer, applying a mask
+    pub fn blit_mask(&self, fb: &mut Framebuffer, mask: Mask) {
         let mut cr = match self.compute_clipping(fb) {
             Some(c) => c,
             None => return
@@ -115,11 +117,20 @@ impl Bitmap<'_> {
             let x_offset: usize = inc_y * fb.width;
             let y_offset: usize = cr.uy * fb.width;
             for inc_x in 0..cr.x_end {
-                fb.pixels[inc_x + x_offset + cr.ux + y_offset] = self.pixels[cr.c];
+                match mask {
+                    Mask::Color(c) => if self.pixels[cr.c] != c { fb.pixels[inc_x + x_offset + cr.ux + y_offset] = self.pixels[cr.c] },
+                    Mask::Bits(b) => if b[cr.c] { fb.pixels[inc_x + x_offset + cr.ux + y_offset] = self.pixels[cr.c] }
+                    Mask::None => fb.pixels[inc_x + x_offset + cr.ux + y_offset] = self.pixels[cr.c]
+                }
                 cr.c += 1;
             }
             cr.c += cr.src_pixel_skip;
         }
+    }
+
+    /// Convenience function to blit without any mask
+    pub fn blit(&self, fb: &mut Framebuffer) {
+        self.blit_mask(fb, Mask::None);
     }
 
     /// Copies a portion of a bitmap to the framebuffer
@@ -141,48 +152,6 @@ impl Bitmap<'_> {
         let th = h;
         let t = Bitmap { x: tx, y: ty, w: tw, h: th, pixels: &t_pixels};
         t.blit(fb);
-    }
-
-    /// Copies a Bitmap to the framebuffer, applying a color mask (color acting as transparent in case of non alpha framebuffers)
-    pub fn blit_cmask(&self, fb: &mut Framebuffer, mask: u32) -> Result<(), BlitError> {
-        let ux = if self.x > 0 { self.x as usize } else { 0 };
-        let uy = if self.y > 0 { self.y as usize } else { 0 };
-        if (self.pixels.len() + (ux + self.w) * (uy + self.h) - self.w * self.h) > fb.pixels.len() {
-            return Err(BlitError::BlittingBeyondBoundaries);
-        };
-        let mut c = 0;
-        for inc_y in 0..self.h {
-            let x_offset: usize = inc_y * fb.width;
-            let y_offset: usize = uy * fb.width;
-            for inc_x in 0..self.w {
-                if self.pixels[inc_x] != mask {
-                    fb.pixels[inc_x + x_offset + ux + y_offset] = self.pixels[c];
-                    c += 1;
-                };
-            }
-        }
-        Ok(())
-    }
-
-    /// Copies a Bitmap to the framebuffer, applying a bits mask (logical AND)
-    pub fn blit_lmask(&self, fb: &mut Framebuffer, mask: &Vec<bool>) -> Result<(), BlitError> {
-        let ux = if self.x > 0 { self.x as usize } else { 0 };
-        let uy = if self.y > 0 { self.y as usize } else { 0 };
-        if (self.pixels.len() + (ux + self.w) * (uy + self.h) - self.w * self.h) > fb.pixels.len() {
-            return Err(BlitError::BlittingBeyondBoundaries);
-        };
-        let mut c = 0;
-        for inc_y in 0..self.h {
-            let x_offset: usize = inc_y * fb.width;
-            let y_offset: usize = uy * fb.width;
-            for inc_x in 0..self.w {
-                if mask[c] {
-                    fb.pixels[inc_x + x_offset + ux + y_offset] = self.pixels[c];
-                    c += 1;
-                };
-            }
-        }
-        Ok(())
     }
 
     fn compute_clipping(&self, fb: &Framebuffer) -> Option<ClippedCoords> {
