@@ -1,5 +1,14 @@
 # Changelog
 
+### v0.5.0 (2020-03-30)
+
+- [Added] Automatic clipping of blitted bitmaps
+- [Added] square & minifb mask examples
+- [Changed] Bitmap coordinates can be negative
+- [Changed] Blitting with mask + added mask enum
+- [TODO] Bits mask import
+- [TODO] More sexy examples
+
 ### v0.4.0 (2020-01-30)
 
 - PNG decoding as 0RGB or RGBA
