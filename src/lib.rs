@@ -6,7 +6,7 @@
 //! let mut pixels: Vec<u32> = vec!(0; WIDTH * HEIGHT);
 //! let mut fb = Framebuffer {width: WIDTH, height: HEIGHT, pixels: &mut pixels};
 //!
-//! // User bitmaps initialization
+//! // For example, you can push all the bitmaps in a single vec to give ownership of all bitmaps
 //! let mut bitmaps = Vec::new();
 //! bitmaps.push(Bitmap {w: 10, h: 10, x: 0, y: 0, pixels: &image::PIXELS});
 //!
@@ -24,9 +24,10 @@
 //! }
 //! ```
 //!
-//! You can also view and run a (very basic) example using the [minifb library](https://crates.io/crates/minifb) in the 'examples' directory:
+//! You can also view and run some (very basic) examples using the [minifb library](https://crates.io/crates/minifb) in the 'examples' directory:
 //! ```text
-//! cargo run --example minifb
+//! cargo run --example square
+//! cargo run --example minifb --features="png-decode"
 //! ```
 
 use std::{fmt, result::Result};
@@ -52,6 +53,7 @@ pub enum Mask<'a> {
     None
 }
 
+/// To prevent buffer overflow
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum BlitError {
     // Index out of bounds
