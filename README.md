@@ -4,6 +4,10 @@
 [![Downloads badge](https://img.shields.io/crates/d/blitter.svg)](https://crates.io/crates/blitter)
 
 This library performs various blitting and drawing operations on a raw 32 bits framebuffer, whatever the encoding.
+- Bitmap blitting / cropping
+- Blit a part of bitmap (ie. bitmap fonts)
+- Blit with a color or bits mask
+- Pixel plotting
 
 Example:
 ```
