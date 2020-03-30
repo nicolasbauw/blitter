@@ -35,4 +35,6 @@ cargo run --example square
 cargo run --example minifb --features="png-decode"
 ```
 
+![Screenshot](resources/screenshot.png)
+
 License: GPL-3.0
