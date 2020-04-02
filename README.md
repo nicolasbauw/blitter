@@ -8,6 +8,7 @@ This library performs various blitting and drawing operations on a raw 32 bits f
 - Blit a part of bitmap (ie. bitmap fonts)
 - Blit with a color or bits mask
 - Pixel plotting
+- Optional PNG decoding feature
 
 Example:
 ```
@@ -39,6 +40,6 @@ cargo run --example square
 cargo run --example minifb --features="png-decode"
 ```
 
-![Screenshot](resources/screenshot.png)
+[![Screenshot](resources/screenshot.png)]
 
 License: GPL-3.0
