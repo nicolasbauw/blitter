@@ -3,6 +3,7 @@
 //! - Blit a part of bitmap (ie. bitmap fonts)
 //! - Blit with a color or bits mask
 //! - Pixel plotting
+//! - Optional PNG decoding feature
 //! 
 //! Example:
 //!```text
@@ -351,13 +352,18 @@ pub fn from_png_file(
     // The default output transformation is `Transformations::EXPAND | Transformations::STRIP_ALPHA`.
     let decoder = png::Decoder::new(File::open(&pngfile)?);
     let (info, mut reader) = decoder.read_info()?;
+    let dpth = match info.color_type {
+        png::ColorType::RGB => 3,
+        png::ColorType::RGBA => 4,
+        _ => return Err(DecodingError::Format(std::borrow::Cow::Borrowed("Function only handles RGB and RGBA formats")))
+    };
     // Allocate the output buffer.
     let mut buf = vec![0; info.buffer_size()];
     // Read the next frame. Currently this function should only called once.
     reader.next_frame(&mut buf)?;
     // convert buffer to u32
     let u32_buffer: Vec<u32> = buf
-        .chunks(3)
+        .chunks(dpth)
         .map(|v| ((v[0] as u32) << 16) | ((v[1] as u32) << 8) | v[2] as u32)
         .map(|x| x << shift)
         .collect();
