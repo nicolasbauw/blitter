@@ -36,8 +36,9 @@ fn blitter_test(mut fb: &mut Framebuffer, bitmaps: &mut Vec<Bitmap>) {
 
 You can also view and run some (very basic) examples using the [minifb library](https://crates.io/crates/minifb) in the 'examples' directory:
 ```
-cargo run --example square
+cargo run --example demo --features="png-decode"
 cargo run --example minifb --features="png-decode"
+cargo run --example square
 ```
 
 [![Screenshot](resources/screenshot.png)]
