@@ -1,5 +1,10 @@
 # Changelog
 
+### v0.6.0 (2020-04-10)
+
+- [Added] Support for RGBA PNG decoding
+- [Added] Library example and screenshot
+
 ### v0.5.0 (2020-03-30)
 
 - [Added] Automatic clipping of blitted bitmaps
