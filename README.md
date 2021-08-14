@@ -43,4 +43,4 @@ cargo run --example square
 
 [![Screenshot](resources/screenshot.png)]
 
-License: GPL-3.0
+License: MIT
